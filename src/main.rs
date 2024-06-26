@@ -17,6 +17,9 @@ struct Cli {
     /// (Optional) Record terminator character.
     #[arg(short, long)]
     terminator: Option<char>,
+    /// (Optional) CSV comment character.
+    #[arg(short, long)]
+    comment_char: Option<char>,
     /// Output format for the table. Valid formats are `markdown`, `confluence`, and `org`.
     #[arg(short, long, default_value = "markdown")]
     output_format: String,
@@ -40,6 +43,7 @@ fn main() {
         reader,
         cli.delimiter as u8,
         cli.terminator,
+        cli.comment_char.map(|c| c as u8),
         Format::from(cli.output_format),
     );
 

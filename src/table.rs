@@ -31,6 +31,7 @@ impl Table {
         rdr: Box<dyn BufRead>,
         delimiter: u8,
         terminator: Option<char>,
+        comment_char: Option<u8>,
         format: Format,
     ) -> Result<Table, Error> {
         let mut binding = ReaderBuilder::new();
@@ -41,6 +42,8 @@ impl Table {
         if let Some(terminator) = terminator {
             reader_builder = reader_builder.terminator(Terminator::Any(terminator as u8));
         }
+
+        reader_builder = reader_builder.comment(comment_char);
 
         let mut reader = reader_builder.from_reader(rdr);
 
