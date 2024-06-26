@@ -32,6 +32,7 @@ impl Table {
         delimiter: u8,
         terminator: Option<char>,
         comment_char: Option<u8>,
+        quoting: bool,
         format: Format,
     ) -> Result<Table, Error> {
         let mut binding = ReaderBuilder::new();
@@ -40,7 +41,8 @@ impl Table {
         let mut reader_builder = binding
             .delimiter(delimiter)
             .has_headers(false)
-            .comment(comment_char);
+            .comment(comment_char)
+            .quoting(quoting);
 
         if let Some(terminator) = terminator {
             reader_builder = reader_builder.terminator(Terminator::Any(terminator as u8));

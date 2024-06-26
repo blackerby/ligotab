@@ -20,6 +20,9 @@ struct Cli {
     /// (Optional) CSV comment character.
     #[arg(short, long)]
     comment_char: Option<char>,
+    /// Disable quoting when reading file.
+    #[arg(short, long, default_value_t = false)]
+    quoting: bool,
     /// Output format for the table. Valid formats are `markdown`, `confluence`, and `org`.
     #[arg(short, long, default_value = "markdown")]
     output_format: String,
@@ -44,6 +47,7 @@ fn main() {
         cli.delimiter as u8,
         cli.terminator,
         cli.comment_char.map(|c| c as u8),
+        !cli.quoting,
         Format::from(cli.output_format),
     );
 
