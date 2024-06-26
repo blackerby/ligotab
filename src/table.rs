@@ -1,5 +1,5 @@
 use crate::format::Format;
-use csv::{Error, ReaderBuilder};
+use csv::{Error, ReaderBuilder, Terminator};
 use std::{fmt::Display, io::BufRead};
 
 pub struct Table {
@@ -27,13 +27,22 @@ impl Escape for String {
 }
 
 impl Table {
-    pub fn new(rdr: Box<dyn BufRead>, delimiter: u8, format: Format) -> Result<Table, Error> {
-        let mut reader = ReaderBuilder::new()
-            .delimiter(delimiter)
-            .has_headers(false)
-            .from_reader(rdr);
-
+    pub fn new(
+        rdr: Box<dyn BufRead>,
+        delimiter: u8,
+        terminator: Option<char>,
+        format: Format,
+    ) -> Result<Table, Error> {
+        let mut binding = ReaderBuilder::new();
         let mut rows: Vec<Vec<String>> = Vec::new();
+
+        let mut reader_builder = binding.delimiter(delimiter).has_headers(false);
+
+        if let Some(terminator) = terminator {
+            reader_builder = reader_builder.terminator(Terminator::Any(terminator as u8));
+        }
+
+        let mut reader = reader_builder.from_reader(rdr);
 
         for result in reader.records() {
             let record = result?

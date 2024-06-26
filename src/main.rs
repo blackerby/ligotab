@@ -14,6 +14,9 @@ struct Cli {
     /// Delimiter character. Expand escape characters in the shell, e.g., `$'\t'`.
     #[arg(short, long, default_value = ",")]
     delimiter: char,
+    /// (Optional) Record terminator character.
+    #[arg(short, long)]
+    terminator: Option<char>,
     /// Output format for the table. Valid formats are `markdown`, `confluence`, and `org`.
     #[arg(short, long, default_value = "markdown")]
     output_format: String,
@@ -33,7 +36,12 @@ fn main() {
         },
     };
 
-    let table = Table::new(reader, cli.delimiter as u8, Format::from(cli.output_format));
+    let table = Table::new(
+        reader,
+        cli.delimiter as u8,
+        cli.terminator,
+        Format::from(cli.output_format),
+    );
 
     match table {
         Ok(t) => println!("{t}"),
