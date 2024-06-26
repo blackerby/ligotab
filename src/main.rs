@@ -11,25 +11,25 @@ struct Cli {
     /// Path to delimiter-separated value file.
     #[arg(default_value = "-")]
     path: String,
-    /// Delimiter character. Expand escape characters in the shell, e.g., `$'\t'`.
+    /// Set the delimiter character. Expand escape characters in the shell, e.g., `$'\t'`.
     #[arg(short, long, default_value = ",")]
     delimiter: char,
-    /// (Optional) Record terminator character.
+    /// (Optional) Set the record terminator character.
     #[arg(short, long)]
     terminator: Option<char>,
-    /// (Optional) CSV comment character.
+    /// (Optional) Set the file commenting character.
     #[arg(short, long)]
     comment_char: Option<char>,
     /// Disable quoting when reading file.
     #[arg(short, long, default_value_t = false)]
     quoting: bool,
-    /// Quoting character
+    /// Set the quoting character.
     #[arg(short = 'u', long, default_value = "\"")]
     quote_char: char,
     /// Disable interpreting double quote as escape
     #[arg(short = 'b', long, default_value_t = false)]
     double_quote: bool,
-    /// Output format for the table. Valid formats are `markdown`, `confluence`, and `org`.
+    /// Set the output format for the table. Valid formats are `markdown`, `confluence`, and `org`.
     #[arg(short, long, default_value = "markdown")]
     output_format: String,
 }
