@@ -37,13 +37,14 @@ impl Table {
         let mut binding = ReaderBuilder::new();
         let mut rows: Vec<Vec<String>> = Vec::new();
 
-        let mut reader_builder = binding.delimiter(delimiter).has_headers(false);
+        let mut reader_builder = binding
+            .delimiter(delimiter)
+            .has_headers(false)
+            .comment(comment_char);
 
         if let Some(terminator) = terminator {
             reader_builder = reader_builder.terminator(Terminator::Any(terminator as u8));
         }
-
-        reader_builder = reader_builder.comment(comment_char);
 
         let mut reader = reader_builder.from_reader(rdr);
 
