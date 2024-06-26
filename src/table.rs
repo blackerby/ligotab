@@ -33,6 +33,8 @@ impl Table {
         terminator: Option<char>,
         comment_char: Option<u8>,
         quoting: bool,
+        quote_char: u8,
+        double_quote: bool,
         format: Format,
     ) -> Result<Table, Error> {
         let mut binding = ReaderBuilder::new();
@@ -42,6 +44,8 @@ impl Table {
             .delimiter(delimiter)
             .has_headers(false)
             .comment(comment_char)
+            .quote(quote_char)
+            .double_quote(double_quote)
             .quoting(quoting);
 
         if let Some(terminator) = terminator {

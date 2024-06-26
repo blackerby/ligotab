@@ -23,6 +23,12 @@ struct Cli {
     /// Disable quoting when reading file.
     #[arg(short, long, default_value_t = false)]
     quoting: bool,
+    /// Quoting character
+    #[arg(short = 'u', long, default_value = "\"")]
+    quote_char: char,
+    /// Disable interpreting double quote as escape
+    #[arg(short = 'b', long, default_value_t = false)]
+    double_quote: bool,
     /// Output format for the table. Valid formats are `markdown`, `confluence`, and `org`.
     #[arg(short, long, default_value = "markdown")]
     output_format: String,
@@ -30,6 +36,8 @@ struct Cli {
 
 fn main() {
     let cli = Cli::parse();
+    let quoting_enabled = !cli.quoting;
+    let double_quoting_enabled = !cli.double_quote;
 
     let reader: Box<dyn BufRead> = match cli.path.as_str() {
         "-" => Box::new(BufReader::new(io::stdin())),
@@ -47,7 +55,9 @@ fn main() {
         cli.delimiter as u8,
         cli.terminator,
         cli.comment_char.map(|c| c as u8),
-        !cli.quoting,
+        quoting_enabled,
+        cli.quote_char as u8,
+        double_quoting_enabled,
         Format::from(cli.output_format),
     );
 
