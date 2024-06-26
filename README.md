@@ -1,9 +1,11 @@
 # ligotab
 ## Tables in a few formats
 
-ligotab is simple command line tool for formatting delimiter-separated values (CSV, etc.) as lightweight markup tables in a few formats. So far, basic [Markdown](https://www.markdownguide.org/extended-syntax/#tables), [Confluence Wiki Markup](https://confluence.atlassian.com/doc/confluence-wiki-markup-251003035.html), and [Org](https://www.gnu.org/software/emacs/manual/html_node/org/Tables.html) tables. ligotab can read from standard input or from a single file. It is a work in progress.
+ligotab is library and command line tool for formatting delimiter-separated values (CSV, etc.) as lightweight markup tables in a few formats. So far, basic [Markdown](https://www.markdownguide.org/extended-syntax/#tables), [Confluence Wiki Markup](https://confluence.atlassian.com/doc/confluence-wiki-markup-251003035.html), and [Org](https://www.gnu.org/software/emacs/manual/html_node/org/Tables.html) tables.  ligotab is a work in progress.
 
-### Usage
+The command line tool, `lgt`, can read from standard input or from a single file.
+
+### Command Line Usage
 ```sh
 Usage: lgt [OPTIONS] [PATH]
 
