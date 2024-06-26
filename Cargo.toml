@@ -1,0 +1,17 @@
+[package]
+name = "ligotab"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clap = { version = "4.5.7", features = ["derive"] }
+csv = "1.3.0"
+
+[profile.release]
+strip = true
+lto = true
+codegen-units = 1
+
+[[bin]]
+name = "lgt"
+path = "src/main.rs"
