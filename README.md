@@ -6,7 +6,7 @@ ligotab is library and command line tool for formatting delimiter-separated valu
 ligotab is an experimental work in progress in desperate need of automated testing.
 
 ### Command Line Usage
-```sh
+```
 Usage: lgt [OPTIONS] [PATH]
 
 Arguments:
