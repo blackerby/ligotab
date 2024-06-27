@@ -2,6 +2,7 @@ use crate::format::Format;
 use csv::{Error, ReaderBuilder, Terminator};
 use std::{fmt::Display, io::BufRead};
 
+#[derive(Debug, PartialEq)]
 pub struct Table {
     header_delimiter: &'static str,
     rule_char: Option<char>,
@@ -196,5 +197,86 @@ impl Table {
 impl Display for Table {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.compose())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::{fs::File, io::BufReader};
+
+    #[test]
+    fn test_escape_pipe() {
+        let original = "There | are | pipes | here";
+        let got = original.to_string().escape_pipe();
+        let want = "There \\| are \\| pipes \\| here";
+
+        assert_eq!(got.as_str(), want);
+    }
+
+    #[test]
+    fn test_escape_brackets() {
+        let original = "There { are } brackets here";
+        let got = original.to_string().escape_brackets();
+        let want = "There \\{ are \\} brackets here";
+
+        assert_eq!(got.as_str(), want);
+    }
+
+    #[test]
+    fn test_new_csv_markdown() {
+        let file = File::open("tests/data/customers-1.csv").unwrap();
+        let reader = Box::new(BufReader::new(file));
+        let rows = vec![
+            vec![
+                "Index",
+                "Customer Id",
+                "First Name",
+                "Last Name",
+                "Company",
+                "City",
+                "Country",
+                "Phone 1",
+                "Phone 2",
+                "Email",
+                "Subscription Date",
+                "Website",
+            ]
+            .iter()
+            .map(|s| s.to_string())
+            .collect(),
+            vec![
+                "1",
+                "DD37Cf93aecA6Dc",
+                "Sheryl",
+                "Baxter",
+                "Rasmussen Group",
+                "East Leonard",
+                "Chile",
+                "229.077.5154",
+                "397.884.0519x718",
+                "zunigavanessa@smith.info",
+                "2020-08-24",
+                "http://www.stephenson.com/",
+            ]
+            .iter()
+            .map(|s| s.to_string())
+            .collect(),
+        ];
+
+        let widths = Some(vec![5, 15, 10, 9, 15, 12, 7, 12, 16, 24, 17, 26]);
+
+        let got = Table::new(reader, b',', None, None, true, b'"', true, Format::Markdown).unwrap();
+
+        let want = Table {
+            header_delimiter: "|",
+            rule_char: Some('-'),
+            rule_intersection: Some('|'),
+            rows,
+            row_delimiter: '|',
+            widths,
+        };
+
+        assert_eq!(got, want);
     }
 }
