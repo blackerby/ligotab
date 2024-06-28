@@ -7,7 +7,8 @@ use std::{fmt::Display, io::BufRead};
 pub struct Table {
     header_delimiter: &'static str,
     rule_char: Option<char>,
-    rule_intersection: Option<char>,
+    border_char: Option<char>,
+    intersection: Option<char>,
     rows: Vec<Vec<String>>,
     row_delimiter: char,
     widths: Option<Vec<usize>>,
@@ -51,7 +52,7 @@ impl Table {
 
         match format {
             Format::Confluence => {
-                return Ok(Table::create(rows, "||", None, None, '|', None));
+                return Ok(Table::create(rows, "||", None, None, None, '|', None));
             }
             ref f => {
                 let row_widths: Vec<Vec<usize>> = rows
@@ -70,6 +71,7 @@ impl Table {
                         rows,
                         "|",
                         Some('='),
+                        Some('-'),
                         Some('+'),
                         '|',
                         col_widths,
@@ -78,6 +80,7 @@ impl Table {
                         rows,
                         "|",
                         Some('-'),
+                        None,
                         Some('+'),
                         '|',
                         col_widths,
@@ -86,6 +89,7 @@ impl Table {
                         rows,
                         "|",
                         Some('-'),
+                        None,
                         Some('|'),
                         '|',
                         col_widths,
@@ -100,7 +104,8 @@ impl Table {
         rows: Vec<Vec<String>>,
         header_delimiter: &'static str,
         rule_char: Option<char>,
-        rule_intersection: Option<char>,
+        border_char: Option<char>,
+        intersection: Option<char>,
         row_delimiter: char,
         widths: Option<Vec<usize>>,
     ) -> Table {
@@ -108,7 +113,8 @@ impl Table {
             rows,
             header_delimiter,
             rule_char,
-            rule_intersection,
+            border_char,
+            intersection,
             row_delimiter,
             widths,
         }
@@ -139,7 +145,7 @@ impl Table {
                 .iter()
                 .map(|w| self.rule_char.unwrap().to_string().repeat(*w))
                 .collect::<Vec<_>>()
-                .join(self.rule_intersection.unwrap().to_string().as_str());
+                .join(self.intersection.unwrap().to_string().as_str());
 
             format!("{}{}{}\n", self.row_delimiter, rule, self.row_delimiter,)
         } else {
@@ -147,7 +153,24 @@ impl Table {
         }
     }
 
-    fn format_rows(&self) -> String {
+    fn format_border(&self) -> Option<String> {
+        if let Some(border_char) = &self.border_char {
+            let widths = self.widths.as_ref().unwrap();
+            let intersection = self.intersection.unwrap();
+
+            let border: String = widths
+                .iter()
+                .map(|w| border_char.to_string().repeat(*w))
+                .collect::<Vec<_>>()
+                .join(intersection.to_string().as_str());
+
+            Some(format!("{}{}{}\n", intersection, border, intersection))
+        } else {
+            None
+        }
+    }
+
+    fn format_rows(&self) -> Vec<String> {
         let rows = &self.rows[1..];
         let data = if let Some(widths) = &self.widths {
             rows.to_owned()
@@ -163,8 +186,7 @@ impl Table {
             rows.to_owned()
         };
 
-        let formatted_rows: String = data
-            .iter()
+        data.iter()
             .map(|row| {
                 format!(
                     "{}{}{}",
@@ -174,9 +196,6 @@ impl Table {
                 )
             })
             .collect::<Vec<String>>()
-            .join("\n");
-
-        format!("{}", formatted_rows)
     }
 
     fn compose(&self) -> String {
@@ -184,7 +203,20 @@ impl Table {
         let rule = self.format_rule();
         let rows = self.format_rows();
 
-        format!("{}{}{}", header, rule, rows)
+        if let Some(border) = self.format_border() {
+            let mut row_string = String::new();
+
+            for row in rows {
+                row_string.push_str(row.as_str());
+                row_string.push('\n');
+                row_string.push_str(border.as_str());
+            }
+
+            format!("{}{}{}{}", border, header, rule, row_string.trim(),)
+        } else {
+            let row_string = rows.join("\n");
+            format!("{}{}{}", header, rule, row_string)
+        }
     }
 }
 
@@ -247,7 +279,8 @@ mod tests {
         let want = Table {
             header_delimiter: "|",
             rule_char: Some('-'),
-            rule_intersection: Some('|'),
+            border_char: None,
+            intersection: Some('|'),
             rows,
             row_delimiter: '|',
             widths,
@@ -295,7 +328,8 @@ mod tests {
         let want = Table {
             header_delimiter: "|",
             rule_char: Some('-'),
-            rule_intersection: Some('|'),
+            border_char: None,
+            intersection: Some('|'),
             rows,
             row_delimiter: '|',
             widths,
