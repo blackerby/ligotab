@@ -13,5 +13,5 @@ lto = true
 codegen-units = 1
 
 [[bin]]
-name = "lgt"
+name = "lt"
 path = "src/main.rs"
