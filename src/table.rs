@@ -247,4 +247,52 @@ mod tests {
 
         assert_eq!(got, want);
     }
+
+    #[test]
+    fn test_new_csv_markdown_comment() {
+        let file = File::open("tests/data/customers-1-comment.csv").unwrap();
+        let reader = Box::new(BufReader::new(file));
+        let rows = vec![vec![
+            "Index",
+            "Customer Id",
+            "First Name",
+            "Last Name",
+            "Company",
+            "City",
+            "Country",
+            "Phone 1",
+            "Phone 2",
+            "Email",
+            "Subscription Date",
+            "Website",
+        ]
+        .iter()
+        .map(|s| s.to_string())
+        .collect()];
+
+        let widths = Some(vec![5, 11, 10, 9, 7, 4, 7, 7, 7, 5, 17, 7]);
+
+        let got = Table::new(
+            reader,
+            b',',
+            None,
+            Some(b'#'),
+            true,
+            b'"',
+            true,
+            Format::Markdown,
+        )
+        .unwrap();
+
+        let want = Table {
+            header_delimiter: "|",
+            rule_char: Some('-'),
+            rule_intersection: Some('|'),
+            rows,
+            row_delimiter: '|',
+            widths,
+        };
+
+        assert_eq!(got, want);
+    }
 }
