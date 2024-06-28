@@ -7,7 +7,7 @@ description = "Format delimited data with lightweight markup"
 repository = "https://github.com/blackerby/ligotab"
 homepage = "https://github.com/blackerby/ligotab"
 license = "MIT"
-keywords = ["csv", "tsv", "markdown", "org", "confluence"]
+keywords = ["csv", "tsv", "markdown", "org", "confluence", "rst"]
 
 [dependencies]
 clap = { version = "4.5.7", features = ["derive"] }
