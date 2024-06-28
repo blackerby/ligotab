@@ -1,7 +1,9 @@
+use crate::escape::Escape;
 use crate::format::Format;
 use csv::{Error, ReaderBuilder, Terminator};
 use std::{fmt::Display, io::BufRead};
 
+#[derive(Debug, PartialEq)]
 pub struct Table {
     header_delimiter: &'static str,
     rule_char: Option<char>,
@@ -9,21 +11,6 @@ pub struct Table {
     rows: Vec<Vec<String>>,
     row_delimiter: char,
     widths: Option<Vec<usize>>,
-}
-
-trait Escape {
-    fn escape_brackets(&self) -> String;
-    fn escape_pipe(&self) -> String;
-}
-
-impl Escape for String {
-    fn escape_pipe(&self) -> Self {
-        self.replace("|", "\\|")
-    }
-
-    fn escape_brackets(&self) -> Self {
-        self.replace("{", "\\{").replace("}", "\\}")
-    }
 }
 
 impl Table {
@@ -196,5 +183,116 @@ impl Table {
 impl Display for Table {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.compose())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::{fs::File, io::BufReader};
+
+    #[test]
+    fn test_new_csv_markdown() {
+        let file = File::open("tests/data/customers-1.csv").unwrap();
+        let reader = Box::new(BufReader::new(file));
+        let rows = vec![
+            vec![
+                "Index",
+                "Customer Id",
+                "First Name",
+                "Last Name",
+                "Company",
+                "City",
+                "Country",
+                "Phone 1",
+                "Phone 2",
+                "Email",
+                "Subscription Date",
+                "Website",
+            ]
+            .iter()
+            .map(|s| s.to_string())
+            .collect(),
+            vec![
+                "1",
+                "DD37Cf93aecA6Dc",
+                "Sheryl",
+                "Baxter",
+                "Rasmussen Group",
+                "East Leonard",
+                "Chile",
+                "229.077.5154",
+                "397.884.0519x718",
+                "zunigavanessa@smith.info",
+                "2020-08-24",
+                "http://www.stephenson.com/",
+            ]
+            .iter()
+            .map(|s| s.to_string())
+            .collect(),
+        ];
+
+        let widths = Some(vec![5, 15, 10, 9, 15, 12, 7, 12, 16, 24, 17, 26]);
+
+        let got = Table::new(reader, b',', None, None, true, b'"', true, Format::Markdown).unwrap();
+
+        let want = Table {
+            header_delimiter: "|",
+            rule_char: Some('-'),
+            rule_intersection: Some('|'),
+            rows,
+            row_delimiter: '|',
+            widths,
+        };
+
+        assert_eq!(got, want);
+    }
+
+    #[test]
+    fn test_new_csv_markdown_comment() {
+        let file = File::open("tests/data/customers-1-comment.csv").unwrap();
+        let reader = Box::new(BufReader::new(file));
+        let rows = vec![vec![
+            "Index",
+            "Customer Id",
+            "First Name",
+            "Last Name",
+            "Company",
+            "City",
+            "Country",
+            "Phone 1",
+            "Phone 2",
+            "Email",
+            "Subscription Date",
+            "Website",
+        ]
+        .iter()
+        .map(|s| s.to_string())
+        .collect()];
+
+        let widths = Some(vec![5, 11, 10, 9, 7, 4, 7, 7, 7, 5, 17, 7]);
+
+        let got = Table::new(
+            reader,
+            b',',
+            None,
+            Some(b'#'),
+            true,
+            b'"',
+            true,
+            Format::Markdown,
+        )
+        .unwrap();
+
+        let want = Table {
+            header_delimiter: "|",
+            rule_char: Some('-'),
+            rule_intersection: Some('|'),
+            rows,
+            row_delimiter: '|',
+            widths,
+        };
+
+        assert_eq!(got, want);
     }
 }
