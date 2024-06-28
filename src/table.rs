@@ -66,6 +66,14 @@ impl Table {
                 );
 
                 match f {
+                    Format::ReStructuredText => Ok(Table::create(
+                        rows,
+                        "|",
+                        Some('='),
+                        Some('+'),
+                        '|',
+                        col_widths,
+                    )),
                     Format::Org => Ok(Table::create(
                         rows,
                         "|",
