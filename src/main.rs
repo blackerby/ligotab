@@ -29,7 +29,7 @@ struct Cli {
     /// Disable interpreting double quote as escape
     #[arg(short = 'b', long, default_value_t = false)]
     double_quote: bool,
-    /// Set the output format for the table. Valid formats are `markdown`, `confluence`, and `org`.
+    /// Set the output format for the table.
     #[arg(short, long, default_value = "markdown")]
     output_format: String,
 }
