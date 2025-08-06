@@ -1,3 +1,5 @@
+# Migrated to https://codeberg.org/blackerby/ligotab/
+
 # ligotab
 ## Tables in a few formats
 
